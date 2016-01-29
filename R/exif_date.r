@@ -1,12 +1,18 @@
 #' Extract EXIF DateTime from Jpeg
 #'
-#' Extract the date and time a photo was taken from the it's EXIF data. This
+#' Extract the date and time a photo was taken from its EXIF data. This
 #' funtion was heavily inspired by the R package \code{EXIFr}, and the
 #' references listed below.
 #'
-#' @param img_path character; path to jpeg
+#' @param img_path character; vector of paths to jpeg images
+#' @param error a logical value indicating whether errors should be raised by
+#'        \code{exif_date}. If \code{error == TRUE}, then an error will be
+#'        raised if the file cannot be found, it is not an image, there is a
+#'        problem with the EXIF data, or there is no date present. If
+#'        \code{error == FALSE}, then exectution should always proceed error
+#'        free, and \code{NA} will be returned in all these problem cases.
 #'
-#' @return Character string representing the datetime as "Y:M:D H:M:S".
+#' @return Character vector with datetime for each image as "Y:M:D H:M:S".
 #' @references
 #'    \url{http://code.flickr.net/2012/06/01/parsing-exif-client-side-using-javascript-2/}
 #'    \url{https://github.com/cmartin/EXIFr/}
@@ -14,7 +20,23 @@
 #' @examples
 #' img_path <- system.file("extdata", "muntjac.jpg", package = "camtrapr")
 #' exif_date(img_path)
-exif_date <- function(img_path) {
+exif_date <- function(img_path, error = TRUE) {
+  if (error) {
+    dt <- vapply(img_path, .exif_date, character(1))
+  } else {
+    dt <- vapply(img_path,
+                 function(x){
+                   tryCatch(.exif_date(x),
+                            error = function(x) NA_character_,
+                            warning = function(x) invisible())
+                 },
+                 character(1)
+    )
+  }
+  unname(dt)
+}
+
+.exif_date <- function(img_path) {
   assertthat::assert_that(file.exists(img_path))
 
   # read the file header; exif data should be in first 128kb

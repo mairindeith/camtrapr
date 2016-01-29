@@ -4,16 +4,23 @@
 \alias{exif_date}
 \title{Extract EXIF DateTime from Jpeg}
 \usage{
-exif_date(img_path)
+exif_date(img_path, error = TRUE)
 }
 \arguments{
-\item{img_path}{character; path to jpeg}
+\item{img_path}{character; vector of paths to jpeg images}
+
+\item{error}{a logical value indicating whether errors should be raised by
+\code{exif_date}. If \code{error == TRUE}, then an error will be
+raised if the file cannot be found, it is not an image, there is a
+problem with the EXIF data, or there is no date present. If
+\code{error == FALSE}, then exectution should always proceed error
+free, and \code{NA} will be returned in all these problem cases.}
 }
 \value{
-Character string representing the datetime as "Y:M:D H:M:S".
+Character vector with datetime for each image as "Y:M:D H:M:S".
 }
 \description{
-Extract the date and time a photo was taken from the it's EXIF data. This
+Extract the date and time a photo was taken from its EXIF data. This
 funtion was heavily inspired by the R package \code{EXIFr}, and the
 references listed below.
 }

@@ -22,5 +22,4 @@
 #'
 #' @name camtrapr
 #' @docType package
-#' @importFrom magrittr %>%
 NULL
