@@ -1,17 +1,20 @@
 Package: camtrapr
 Title: Camera Trap Photo Processing
 Version: 0.0.0.9000
-Authors@R: "Matthew Strimas-Mackey <mstrimas@gmail.com> [aut,cre]"
+Date: 2016-02-01
+Authors@R: person("Matthew", "Strimas-Mackey", NA, "mstrimas@gmail.com", c("aut", "cre"))
 Description: This R package aids in the processing of camera trap photos in
     preparation for further statistical analysis in R. Species within each photo
     should be identified, and the photos should be organized into a specific
     directory structure, prior to using the functions within the package.
 Depends:
-    R (>= 3.2.3)
+    R (>= 3.2.0)
 License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/mstrimas/camtrapr
 BugReports: https://github.com/mstrimas/camtrapr/issues
 Imports:
-    assertthat
+    assertthat,
+    dplyr,
+    plyr
 RoxygenNote: 5.0.1

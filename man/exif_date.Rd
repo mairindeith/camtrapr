@@ -4,10 +4,10 @@
 \alias{exif_date}
 \title{Extract EXIF DateTime from Jpeg}
 \usage{
-exif_date(img_path, error = TRUE)
+exif_date(img, error = TRUE)
 }
 \arguments{
-\item{img_path}{character; vector of paths to jpeg images}
+\item{img}{character; vector of paths to jpeg images}
 
 \item{error}{a logical value indicating whether errors should be raised by
 \code{exif_date}. If \code{error == TRUE}, then an error will be
@@ -25,8 +25,10 @@ funtion was heavily inspired by the R package \code{EXIFr}, and the
 references listed below.
 }
 \examples{
-img_path <- system.file("extdata", "muntjac.jpg", package = "camtrapr")
-exif_date(img_path)
+img <- system.file("extdata", "muntjac.jpg", package = "camtrapr")
+exif_date(img)
+img <- system.file("extdata", "no-date.jpg", package = "camtrapr")
+exif_date(img, error = FALSE)
 }
 \references{
 \url{http://code.flickr.net/2012/06/01/parsing-exif-client-side-using-javascript-2/}

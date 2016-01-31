@@ -4,12 +4,22 @@
 \alias{cam_process}
 \title{Process Camera Trap Photos}
 \usage{
-cam_process(path, strict = TRUE)
+cam_process(path, clean_names = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{path}{character; base path for all photos}
 
-\item{strict}{logical}
+\item{clean_names}{logical idicating whether to clean up site, camera, and
+species names. If \code{TRUE}, leading and trailing whitespace is
+trimmed, any non-alphanumeric character will be converted to an
+underscore, then groups of more than one underscore will be collapsed
+to one. WARNING: if names are cleaned it is possible that previously
+unique site, camera, or species names will no longer be unique.}
+
+\item{verbose}{logical indicating whether to print messages highlighting
+potential issues including directories than have been ignore, invalid
+directory structures, and count directories not corresponding to
+integers.}
 }
 \value{
 Data frame of processed camera trapping photo data.
@@ -20,5 +30,7 @@ Process Camera Trap Photos
 \examples{
 photo_path <- system.file("extdata", "example_photos", package = "camtrapr")
 cam_process(photo_path)
+messy_path <- system.file("extdata", "messy", package = "camtrapr")
+cam_process(messy_path)
 }
 
