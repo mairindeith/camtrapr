@@ -12,5 +12,5 @@ devtools::install_github("mstrimas/camtrapr", build_vignettes = TRUE)
 For details on the use of this package consult the vignette:
 
 ```r
-browseVignettes('foofactors')
+browseVignettes('camtrapr')
 ```

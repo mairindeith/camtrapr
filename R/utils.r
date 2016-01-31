@@ -25,6 +25,11 @@ find_bad_counts <- function(x) {
   !grepl("^(([0-9]+)|([xX]{1}))$", x)
 }
 
+find_bad_names <- function(x) {
+  assertthat::assert_that(is.character(x))
+  l <- vapply(x, function(x) any(grepl("[^_[:alnum:]]", split_path(x))), logical(1))
+}
+
 # given a df with a path to photo variable, split and convert into variables
 parse_path <- function(x) {
   assertthat::assert_that(is.character(x))

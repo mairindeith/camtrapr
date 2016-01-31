@@ -1,4 +1,4 @@
-#' Process Camera Trap Photos
+#' Process camera trap photos
 #'
 #' @param path character; base path for all photos
 #' @param clean_names logical idicating whether to clean up site, camera, and

@@ -2,7 +2,7 @@
 % Please edit documentation in R/cam_process.r
 \name{cam_process}
 \alias{cam_process}
-\title{Process Camera Trap Photos}
+\title{Process camera trap photos}
 \usage{
 cam_process(path, clean_names = TRUE, verbose = TRUE)
 }
@@ -25,12 +25,14 @@ integers.}
 Data frame of processed camera trapping photo data.
 }
 \description{
-Process Camera Trap Photos
+Process camera trap photos
 }
 \examples{
 photo_path <- system.file("extdata", "example_photos", package = "camtrapr")
-cam_process(photo_path)
+cam_data <- cam_process(photo_path)
+dplyr::glimpse(cam_data)
 messy_path <- system.file("extdata", "messy", package = "camtrapr")
-cam_process(messy_path)
+messy_data <- cam_process(messy_path)
+dplyr::glimpse(messy_data)
 }
 

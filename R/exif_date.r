@@ -23,7 +23,13 @@
 #' img <- system.file("extdata", "no-date.jpg", package = "camtrapr")
 #' exif_date(img, error = FALSE)
 exif_date <- function(img, error = TRUE) {
-  pbar <- ifelse(length(img) > 50, "text", "none")
+  if (length(img) > 50) {
+    message("Reading EXIF Metadata:")
+    pbar <- "text"
+  } else {
+    pbar <- "none"
+  }
+
   if (error) {
     dt <- plyr::laply(img, .exif_date, .progress = pbar)
   } else {
