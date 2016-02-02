@@ -4,10 +4,18 @@
 \alias{cam_process}
 \title{Process camera trap photos}
 \usage{
-cam_process(path, clean_names = TRUE, verbose = TRUE)
+cam_process(path, as_datetime = TRUE, tz = "UTC", clean_names = TRUE,
+  verbose = TRUE)
 }
 \arguments{
 \item{path}{character; base path for all photos}
+
+\item{as_datetime}{a logical value indicating whether the datetimes should
+be returned as POSIXct datetime objects (default) or character strings.}
+
+\item{tz}{a character string that specifies which time zone to parse the
+date with. The string must be a time zone that is recognized by the
+user's OS. Ignored if \code{as_datetime = FALSE}.}
 
 \item{clean_names}{logical idicating whether to clean up site, camera, and
 species names. If \code{TRUE}, leading and trailing whitespace is
@@ -25,7 +33,36 @@ integers.}
 Data frame of processed camera trapping photo data.
 }
 \description{
-Process camera trap photos
+Process organized and identified camera trap photos into a dataframe.
+}
+\details{
+This function requires that animals in camera trap photos have been
+identified and photos have been organized into a strict, hierarchical
+directory structure. In brief, every photo should be placed into a series of
+directories such as \code{site/camera/species/number/photo.jpg} where:
+
+\enumerate{
+ \item \code{site}: names of the location where cameras were placed
+ \item \code{camera}: unique identifiers for each camera
+ \item \code{species}: name of species identified in photo
+ \item \code{number}: number (e.g. 3) of individuals in photo. If the number
+     of individuals is unknown use "x" for the directory name.
+ \item \code{photo.jpg}: photos are placed at the end of this chain of
+     directories, the actual name of the photo is irrelevant, but it must
+     have an EXIF datetime stamp
+ }
+
+All these directory are placed within a top-level directory containing no
+ other files. It is this directory that is passed to \code{cam_process()}.
+ The recommended best practice is to only use underscores and lowercase
+ letters in all site, camera, and species directory names. Uppercase letters,
+ special characters, and whitespace should be avoided.
+
+It is critical that the directory structure is correct because
+ \code{cam_process()} will use this structure populate the resulting data
+ frame. As a result, it is highly recommended that users run
+ \code{\link{cam_check}} to find and correct any problems before
+ \code{cam_process()} is run.
 }
 \examples{
 photo_path <- system.file("extdata", "example_photos", package = "camtrapr")

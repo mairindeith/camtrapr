@@ -1,5 +1,35 @@
 #' Process camera trap photos
 #'
+#' Process organized and identified camera trap photos into a dataframe.
+#'
+#' This function requires that animals in camera trap photos have been
+#' identified and photos have been organized into a strict, hierarchical
+#' directory structure. In brief, every photo should be placed into a series of
+#' directories such as \code{site/camera/species/number/photo.jpg} where:
+#'
+#' \enumerate{
+#'  \item \code{site}: names of the location where cameras were placed
+#'  \item \code{camera}: unique identifiers for each camera
+#'  \item \code{species}: name of species identified in photo
+#'  \item \code{number}: number (e.g. 3) of individuals in photo. If the number
+#'      of individuals is unknown use "x" for the directory name.
+#'  \item \code{photo.jpg}: photos are placed at the end of this chain of
+#'      directories, the actual name of the photo is irrelevant, but it must
+#'      have an EXIF datetime stamp
+#'  }
+#'
+#'  All these directory are placed within a top-level directory containing no
+#'  other files. It is this directory that is passed to \code{cam_process()}.
+#'  The recommended best practice is to only use underscores and lowercase
+#'  letters in all site, camera, and species directory names. Uppercase letters,
+#'  special characters, and whitespace should be avoided.
+#'
+#'  It is critical that the directory structure is correct because
+#'  \code{cam_process()} will use this structure populate the resulting data
+#'  frame. As a result, it is highly recommended that users run
+#'  \code{\link{cam_check}} to find and correct any problems before
+#'  \code{cam_process()} is run.
+#'
 #' @param path character; base path for all photos
 #' @param clean_names logical idicating whether to clean up site, camera, and
 #'        species names. If \code{TRUE}, leading and trailing whitespace is
@@ -11,6 +41,7 @@
 #'        potential issues including directories than have been ignore, invalid
 #'        directory structures, and count directories not corresponding to
 #'        integers.
+#' @inheritParams exif_date
 #'
 #' @return Data frame of processed camera trapping photo data.
 #' @export
@@ -21,7 +52,8 @@
 #' messy_path <- system.file("extdata", "messy", package = "camtrapr")
 #' messy_data <- cam_process(messy_path)
 #' dplyr::glimpse(messy_data)
-cam_process <- function(path, clean_names = TRUE, verbose = TRUE) {
+cam_process <- function(path, as_datetime = TRUE, tz = "UTC",
+                        clean_names = TRUE, verbose = TRUE) {
   assertthat::assert_that(is.character(path),
                           length(path) == 1,
                           dir.exists(path))
@@ -52,7 +84,8 @@ cam_process <- function(path, clean_names = TRUE, verbose = TRUE) {
   photos <- photos[!bad_sd]
 
   # find exif dates for these photos
-  dt <- exif_date(file.path(path, photos), error = FALSE)
+  dt <- exif_date(file.path(path, photos), as_datetime = as_datetime,
+                  tz = tz, error = FALSE)
   cam_data <- data.frame(photo_path = dirname(photos),
                          photo_file = basename(photos),
                          datetime = dt,
@@ -81,5 +114,8 @@ cam_process <- function(path, clean_names = TRUE, verbose = TRUE) {
   cam_data$n[tolower(cam_data$n) == "x"] <- NA
   cam_data <- dplyr::mutate_(cam_data, n = ~as.integer(n))
 
-  dplyr::arrange_(cam_data, "site", "camera", "species", "n", "datetime")
+  cam_data <- dplyr::arrange_(cam_data, "site", "camera", "species", "n",
+                              "datetime")
+  cam_data <- dplyr::tbl_df(cam_data)
+  structure(cam_data, class = c("cam_data", class(cam_data)))
 }
