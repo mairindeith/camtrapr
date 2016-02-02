@@ -30,7 +30,9 @@ directory structures, and count directories not corresponding to
 integers.}
 }
 \value{
-Data frame of processed camera trapping photo data.
+Data frame (with class \code{tbl_df} from \code{dplyr}) of processed
+  camera trapping photo data. The returned data frame also has S3 class
+  \code{cam_data} for use with other methods in the \code{camtrapr} package.
 }
 \description{
 Process organized and identified camera trap photos into a dataframe.

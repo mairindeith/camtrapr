@@ -43,7 +43,9 @@
 #'        integers.
 #' @inheritParams exif_date
 #'
-#' @return Data frame of processed camera trapping photo data.
+#' @return Data frame (with class \code{tbl_df} from \code{dplyr}) of processed
+#'   camera trapping photo data. The returned data frame also has S3 class
+#'   \code{cam_data} for use with other methods in the \code{camtrapr} package.
 #' @export
 #' @examples
 #' photo_path <- system.file("extdata", "example_photos", package = "camtrapr")
