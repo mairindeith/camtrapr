@@ -8,14 +8,10 @@
 #' @section camtrapr functions:
 #'
 #' \enumerate{
-#'  \item \code{fbind}: create a new factor from two existing factors, where the new
-#'        factor's levels are the union of the levels of the input factors.
-#'  \item \code{freq_out}: make a frequency table for a factor
-#'  \item \code{factor_asis}: convert character to factor ordering levels as
-#'        they appear in the original vector
-#'  \item \code{fwrite_csv}: write to file preserving factor information
-#'  \item \code{fread_csv}: read to file preserving factor information
-#'  }
+#'  \item \code{cam_check}: check photos are directory structure for errors
+#'  \item \code{cam_process}: process photos into a data frame
+#'  \item \code{exif_date}: read EXIF date of a Jpeg image
+#' }
 #'
 #' To learn more about camtrapr, start with the vignettes:
 #' \code{browseVignettes(package = "camtrapr")}

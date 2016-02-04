@@ -4,7 +4,8 @@
 \alias{exif_date}
 \title{Extract EXIF DateTime from Jpeg}
 \usage{
-exif_date(img, as_datetime = TRUE, tz = "UTC", error = FALSE)
+exif_date(img, as_datetime = TRUE, tz = "UTC", progress = TRUE,
+  error = FALSE)
 }
 \arguments{
 \item{img}{a character vector of paths to jpeg images}
@@ -15,6 +16,8 @@ returned as POSIXct datetime objects (default) or character strings.}
 \item{tz}{a character string that specifies which time zone to parse the date
 with. The string must be a time zone that is recognized by the user's OS.
 Ignored if \code{as_datetime = FALSE}.}
+
+\item{progress}{logical indicating if a progress bar should be displayed}
 
 \item{error}{a logical value indicating whether errors should be raised by
 \code{exif_date}. If \code{error = TRUE}, then an error will be raised if

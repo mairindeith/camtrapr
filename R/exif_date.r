@@ -19,6 +19,7 @@
 #' @param tz a character string that specifies which time zone to parse the date
 #'   with. The string must be a time zone that is recognized by the user's OS.
 #'   Ignored if \code{as_datetime = FALSE}.
+#' @param progress logical indicating if a progress bar should be displayed
 #' @param error a logical value indicating whether errors should be raised by
 #'   \code{exif_date}. If \code{error = TRUE}, then an error will be raised if
 #'   the file cannot be found, it is not an image, there is a problem with the
@@ -38,8 +39,9 @@
 #' img_nodate <- system.file("extdata", "no-date.jpg", package = "camtrapr")
 #' exif_date(c(img, img_nodate), error = FALSE)
 #' exif_date(c(img, img_nodate), as_datetime = FALSE, error = FALSE)
-exif_date <- function(img, as_datetime = TRUE, tz = "UTC", error = FALSE) {
-  if (length(img) > 25) {
+exif_date <- function(img, as_datetime = TRUE, tz = "UTC", progress = TRUE,
+                      error = FALSE) {
+  if (progress && (length(img) > 25)) {
     message("Reading EXIF Metadata:")
     pbar <- "text"
   } else {

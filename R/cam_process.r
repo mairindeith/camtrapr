@@ -94,7 +94,7 @@ cam_process <- function(path, as_datetime = TRUE, tz = "UTC",
 
   # find exif dates for these photos
   dt <- exif_date(file.path(path, photos), as_datetime = as_datetime,
-                  tz = tz, error = FALSE)
+                  tz = tz, progress = verbose, error = FALSE)
   cam_data <- data.frame(photo_path = dirname(photos),
                          photo_file = basename(photos),
                          datetime = dt,

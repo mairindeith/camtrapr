@@ -1,10 +1,10 @@
 ---
-title: "Vignette Title"
-author: "Vignette Author"
+title: "Camera Trap Photo Processing"
+author: "Matt Strimas-Mackey"
 date: "`r Sys.Date()`"
 output: html_document
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Camera Trap Photo Processing}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,15 +15,15 @@ knitr::opts_chunk$set(collapse = TRUE, message = FALSE, comment = "#>",
 ```
 
 
-`camtrapr` is designed to process photos from camera trapping projects into a form useful for further analyis in R. The functions are inspired by the Windows programs developed for the same purpose by the [Small Wild Cat Conservation Foundation](http://www.smallcats.org/). So, users of these tools will easily be able to transition to `camtrapr`.
+`camtrapr` is designed to process photos from camera trapping projects into a form useful for further analysis in R. The functions are inspired by the Windows programs developed for the same purpose by the [Small Wild Cat Conservation Foundation](http://www.smallcats.org/). So, users of these tools will easily be able to transition to `camtrapr`.
 
-The motivation behind creating this package was a desire to have an open source, cross platform tool (i.e. not Windows only) that allows for a seamless R camera trapping workflow.
+The motivation behind creating this package was a desire to have an open source, user friendly, cross platform tool (i.e. not Windows only) that allows for a seamless R camera trapping workflow.
 
 # Example Datasets
 
 This package comes with two sets of example photos to demonstrate the functionality of the package. They are from a hypothetical camera trapping project that sampled a logged forest and a primary forest to compare mammal diversity. At each site two camera trap stations were set up, and a variety of mammal species were caught on camera and identified.
 
-In the first set of photos, they have all been correctly identified and organized. In the second, a variety of errors have been intentially introduced. These paths to these photos on your local machine are given by:
+In the first set of photos, they have all been correctly identified and organized. In the second, a variety of errors have been intentionally introduced. The paths to these photos on your local machine are given by:
 
 ```{r, results='hide'}
 library(camtrapr)
@@ -41,7 +41,7 @@ The assumption is that you have a project where you're trapping at multiple site
 project/site/camera/species/n/photo.jpg
 ```
 
-Where each subdirectory conveys a distinct piece of metadata as follows:
+Where each sub-directory conveys a distinct piece of metadata as follows:
 
 1.  `project`: a top level directory for a given project, which should contain
     only organized camera trap photos and nothing else.
@@ -58,7 +58,7 @@ Where each subdirectory conveys a distinct piece of metadata as follows:
     
 There is one exception to this hierarchy: if any directory is named `ignore`, all its contents will be completely ignore. This is a good way to deal with photos that haven't been sorted yet or photos that have no animal in them.
 
-As an example, the example photos provided with this package are organized as follows:
+As an example, the sample photos provided with this package are organized as follows:
 
 ```
 example-photos/
@@ -112,28 +112,28 @@ For brevity, only the first image is displayed within each directory. In this ex
 
 ## Naming Files
 
-Adhering to strict, well thought out file naming conventions is critical to reduces the number of errors introduced into your data. `camtrapr` will work on messy directory names, but I **strongly** recommend following these protocols when naming the directories in the above hierarchy:
+Adhering to strict, well thought out file naming conventions is critical to reducing the number of errors introduced into your data. `camtrapr` will work on messy directory names, but I **strongly** recommend following these protocols when naming the directories in the above hierarchy:
 
 - Use only letters (a-z) and numbers (0-9) in directory names. No 
-  special characters, e.g. %, &, or #.
+  special characters, e.g. `%`, `&`, or `#`.
 - Avoid uppercase letters (A-Z). This will avoid giving multiple names to the 
-  species, e.g. "Deer" and "deer".
-- Avoid whitespace in names, instead use underscores (_) or dashes (-) as 
-  seperators
-- Be consistent! If you decide to use "_" as a seperator, stick with it and 
-  don't also use "-". Try not to mix common and scientific names. Again, this
+  species, e.g. `Deer` and `deer`.
+- Avoid whitespace in names, instead use underscores (`_`) or dashes (`-`) as 
+  separators
+- Be consistent! If you decide to use `_` as a separator, stick with it and 
+  don't also use `-`. Try not to mix common and scientific names. Again, this
   will ensure you don't end up with multiple "species" that are actually the 
-  same, e.g. "elephant", "AsianElephant", "asian-elephant", and 
-  "Elephas_maximus".
+  same, e.g. `elephant`, `AsianElephant`, `asian-elephant`, and 
+  `Elephas_maximus`.
 
 # Checking for Errors
 
 Prior to processing the camera trap photos, it's recommended that you run `cam_check()` to help find any errors that may have been introduced during the file organization and naming process.
 
-The `messy` directory, provided with this package, has a variety of intentially introduced errors. To run the checks, you just provide the path to this directory to the `cam_checks()` function.
+The `messy` directory, provided with this package, has a variety of intentionally introduced errors. To run the checks, provide the path to this directory to the `cam_check()` function.
 
 ```{r}
-(messy_path <- system.file("extdata", "messy", package = "camtrapr"))
+messy_path <- system.file("extdata", "messy", package = "camtrapr")
 checks <- cam_check(messy_path)
 ```
 
@@ -141,8 +141,8 @@ checks <- cam_check(messy_path)
 
 The list elements, and corresponding names, are:
 
-- `ignore`: photos ignored because they're it directories named "ignore".
-- `directory_problem`: photos that are not correctly nested within subdirectory
+- `ignore`: photos ignored because they're in directories named `ignore`.
+- `directory_problem`: photos that are not correctly nested within sub-directory
   structure.
 - `missing_date`: photos that have no associated EXIF date
 - `name_problem`: directories with spaces or special characters in the name; 
@@ -158,13 +158,13 @@ The default print methods provides a concise summary:
 checks
 ```
 
-Evidently there are a bunch of potential issues that need investigating. For further details on each check, access the corresponding element. For example, there appears to be two directory problems:
+Evidently there are a bunch of potential issues that need investigating. For further details on each, access the corresponding list element. For example, there appears to be two directory problems:
 
 ```{r}
 checks$directory_problem
 ```
 
-These photos are not in the correct hierarchy as describe above. In particular, the first is not within a directory for the count and the second is missing count and species directoryies. After fixing these images we can move on to another check.
+These photos are not in the correct hierarchy as describe above. In particular, the first is not within a directory for the count and the second is missing count and species directories. After fixing these images we can move on to another check.
 
 There is one photo that's missing an EXIF date.
 
@@ -180,35 +180,43 @@ The next check looks at non-standard naming of files.
 checks$name_problem
 ```
 
-In the first case there's a special character (`@`), and in the second the name contains a space. Photo processing will work despite these issues; however, best practices suggest fixing the names to be in the standard format.
+In the first case there's a special character (`@`), and in the second the name contains a space. Photo processing will work despite these issues; however, the best practice is to fix the names so they're in the standard format.
 
-`count_problem` highlights a couple directories for which the count subdirectory has been named "one" rather than "1".
+`count_problem` highlights a couple directories for which the count sub-directory has been named `one` rather than `1`.
 
 ```{r}
 checks$count_problem
 ```
 
-Finally, `species` gives an alphabetical list of species in the dataset. Taking a quick look at this is a good way to check for potential typoes.
+Finally, `species` gives an alphabetical list of species in the dataset. Taking a quick look at this is a good way to check for potential typos.
 
 ```{r}
 checks$species
 ```
 
-Sure enough Muntjac has been mispelled twice, and Wild Boar appears under two names: "wild-board" and "wildboar".
+Sure enough Muntjac has been misspelled twice, and Wild Boar appears under two names: `wild-board` and `wildboar`.
 
-The moral of the exercise is that quickly running through these checks before processing the data can save time and frustration further down the line.
+Quickly running through these checks (and correcting issues!) before processing the photos can save time and frustration further down the line.
 
 # Processing Camera Trap Photos
 
-Now that the hard work of identifying and organizing your photos is done, and you've used `cam_check()` to ensure no mistakes were made, it's time to process the photos into a nice data frame with `cam_process()`. In the simplest case, just provide the path to the top-level directory.
+Now that the hard work of identifying and organizing your photos is done, and you've used `cam_check()` to ensure no mistakes were made, it's time to process the photos into a data frame with `cam_process()`. In the simplest case, just provide the path to the top-level directory.
 
 ```{r, results='hide'}
 photo_path <- system.file("extdata", "example-photos", package = "camtrapr")
 cam_data <- cam_process(photo_path)
 ```
 
-The photos have now been processed into a data frame ready for analysis.
+In the resulting data frame, each row corresponds to a single photo and the columns provide information about that photo
 
 ```{r, echo=F}
-knitr::kable(head(cam_data, 10))
+knitr::kable(head(cam_data, 5))
 ```
+
+The columns `photo_path` and `photo_file` specify the location and filename of the image, which connects each row back to the image from which it was derived. We can also look at the structure and data types of the columns.
+
+```{r}
+dplyr::glimpse(cam_data)
+```
+
+Note that the column `datetime` is not a character string, but a POSIXct DateTime object. This will prove useful for later processing involving manipulation of the date and time.
