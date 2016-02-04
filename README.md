@@ -79,7 +79,7 @@ knitr::kable(head(cam_data, 5))
 | logged/cam001/squirrel/1 | IMG025.JPG  | logged | cam001 | squirrel |    1| 2014-06-02 18:43:13 |
 | logged/cam001/squirrel/1 | IMG026.JPG  | logged | cam001 | squirrel |    1| 2014-06-25 14:21:32 |
 
-For further details on the use of this package consult the vignette:
+For further details on the use of this package consult the [vignette on GitHub](https://github.com/mstrimas/camtrapr/blob/master/vignettes/photo-processing.md) or via:
 
 ``` r
 browseVignettes('camtrapr')
