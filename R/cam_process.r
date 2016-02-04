@@ -116,7 +116,7 @@ cam_process <- function(path, as_datetime = TRUE, tz = "UTC",
   # parse final subdirectory into numbers
   bad_counts <- find_bad_counts(cam_data$n)
   if (verbose && any(bad_counts)) {
-    message("The following directories do no have valid counts:")
+    message("The following directories do not have valid counts:")
     message(paste(unique(cam_data$photo_path[bad_counts]), collapse = "\n"))
   }
   cam_data$n[bad_counts] <- NA

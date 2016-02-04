@@ -65,6 +65,12 @@ This package is designed to take a set of identified and organized camera trap p
 
 And produce a tidy data frame ready for analysis like this:
 
+``` r
+photo_path <- system.file("extdata", "example-photos", package = "camtrapr")
+cam_data <- cam_process(photo_path, verbose = FALSE)
+knitr::kable(head(cam_data, 5))
+```
+
 | photo\_path              | photo\_file | site   | camera | species  |    n| datetime            |
 |:-------------------------|:------------|:-------|:-------|:---------|----:|:--------------------|
 | logged/cam001/muntjac/1  | IMG020.JPG  | logged | cam001 | muntjac  |    1| 2014-06-14 07:36:50 |

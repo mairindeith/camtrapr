@@ -81,7 +81,7 @@ camera-trap-photos/
 
 And produce a tidy data frame ready for analysis like this:
 
-```{r, echo=F}
+```{r}
 photo_path <- system.file("extdata", "example-photos", package = "camtrapr")
 cam_data <- cam_process(photo_path, verbose = FALSE)
 knitr::kable(head(cam_data, 5))

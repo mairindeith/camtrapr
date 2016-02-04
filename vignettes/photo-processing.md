@@ -1,7 +1,7 @@
 ---
 title: "Camera Trap Photo Processing"
 author: "Matt Strimas-Mackey"
-date: "`r Sys.Date()`"
+date: "2016-02-04"
 output: html_document
 vignette: >
   %\VignetteIndexEntry{Camera Trap Photo Processing}
@@ -9,10 +9,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include=F}
-knitr::opts_chunk$set(collapse = TRUE, message = FALSE, comment = "#>", 
-                      warning = FALSE)
-```
+
 
 `camtrapr` is designed to process photos from camera trapping projects into a form useful for further analysis in R. The functions are inspired by the Windows programs developed for the same purpose by the [Small Wild Cat Conservation Foundation](http://www.smallcats.org/). So, users of these tools will easily be able to transition to `camtrapr`.
 
@@ -24,7 +21,8 @@ This package comes with two sets of example photos to demonstrate the functional
 
 In the first set of photos, they have all been correctly identified and organized. In the second, a variety of errors have been intentionally introduced. The paths to these photos on your local machine are given by:
 
-```{r, results='hide'}
+
+```r
 library(camtrapr)
 system.file("extdata", "example-photos", package = "camtrapr")
 system.file("extdata", "messy", package = "camtrapr")
@@ -131,7 +129,8 @@ Prior to processing the camera trap photos, it's recommended that you run `cam_c
 
 The `messy` directory, provided with this package, has a variety of intentionally introduced errors. To run the checks, provide the path to this directory to the `cam_check()` function.
 
-```{r}
+
+```r
 messy_path <- system.file("extdata", "messy", package = "camtrapr")
 checks <- cam_check(messy_path)
 ```
@@ -153,44 +152,64 @@ The list elements, and corresponding names, are:
 
 The default print methods provides a concise summary:
 
-```{r}
+
+```r
 checks
+#> # photos in ignored directories (ignore):  1 
+#> # photos in non-standard directories (directory_problem):  2 
+#> # photos with datetime or EXIF problems (missing_date):  1 
+#> # naming problems (name_problem):  2 
+#> # count directory parse errors (count_problem):  2 
+#> # sites (site):  2 
+#> # cameras (camera):  4 
+#> # species (species):  5
 ```
 
 Evidently there are a bunch of potential issues that need investigating. For further details on each, access the corresponding list element. For example, there appears to be two directory problems:
 
-```{r}
+
+```r
 checks$directory_problem
+#> [1] "primary/cam 004/wild_boar/IMG016.JPG"
+#> [2] "primary/cam003/IMG001.JPG"
 ```
 
 These photos are not in the correct hierarchy as describe above. In particular, the first is not within a directory for the count and the second is missing count and species directories. After fixing these images we can move on to another check.
 
 There is one photo that's missing an EXIF date.
 
-```{r}
+
+```r
 checks$missing_date
+#> [1] "primary/cam 004/muntjac/1/IMG011.jpg"
 ```
 
 This image should be removed or, if the date and time can be found by some other method, the image can be included, but you'll have to manually enter the date after processing the photos.
 
 The next check looks at non-standard naming of files.
 
-```{r}
+
+```r
 checks$name_problem
+#> [1] "logged/cam001/muntj@c"   "primary/cam 004/muntjac"
 ```
 
 In the first case there's a special character (`@`), and in the second the name contains a space. Photo processing will work despite these issues; however, the best practice is to fix the names so they're in the standard format.
 
 `count_problem` highlights a couple directories for which the count sub-directory has been named `one` rather than `1`.
 
-```{r}
+
+```r
 checks$count_problem
+#> [1] "logged/cam001/muntj@c/one" "primary/cam003/muntjc/one"
 ```
 
 Finally, `species` gives an alphabetical list of species in the dataset. Taking a quick look at this is a good way to check for potential typos.
 
-```{r}
+
+```r
 checks$species
+#> [1] "muntj@c"   "muntjac"   "muntjc"    "wild-boar" "wildboar"
 ```
 
 Sure enough Muntjac has been misspelled twice, and Wild Boar appears under two names: `wild-board` and `wildboar`.
@@ -201,21 +220,37 @@ Quickly running through these checks (and correcting issues!) before processing 
 
 Now that the hard work of identifying and organizing your photos is done, and you've used `cam_check()` to ensure no mistakes were made, it's time to process the photos into a data frame with `cam_process()`. In the simplest case, just provide the path to the top-level directory.
 
-```{r, results='hide'}
+
+```r
 photo_path <- system.file("extdata", "example-photos", package = "camtrapr")
 cam_data <- cam_process(photo_path)
 ```
 
 In the resulting data frame, each row corresponds to a single photo and the columns provide information about that photo
 
-```{r, echo=F}
-knitr::kable(head(cam_data, 5))
-```
+
+|photo_path               |photo_file |site   |camera |species  |  n|datetime            |
+|:------------------------|:----------|:------|:------|:--------|--:|:-------------------|
+|logged/cam001/muntjac/1  |IMG020.JPG |logged |cam001 |muntjac  |  1|2014-06-14 07:36:50 |
+|logged/cam001/muntjac/1  |IMG021.JPG |logged |cam001 |muntjac  |  1|2014-06-14 07:36:54 |
+|logged/cam001/muntjac/1  |IMG022.JPG |logged |cam001 |muntjac  |  1|2014-07-06 21:07:23 |
+|logged/cam001/squirrel/1 |IMG025.JPG |logged |cam001 |squirrel |  1|2014-06-02 18:43:13 |
+|logged/cam001/squirrel/1 |IMG026.JPG |logged |cam001 |squirrel |  1|2014-06-25 14:21:32 |
 
 The columns `photo_path` and `photo_file` specify the location and filename of the image, which connects each row back to the image from which it was derived. We can also look at the structure and data types of the columns.
 
-```{r}
+
+```r
 dplyr::glimpse(cam_data)
+#> Observations: 30
+#> Variables: 7
+#> $ photo_path (chr) "logged/cam001/muntjac/1", "logged/cam001/muntjac/1...
+#> $ photo_file (chr) "IMG020.JPG", "IMG021.JPG", "IMG022.JPG", "IMG025.J...
+#> $ site       (chr) "logged", "logged", "logged", "logged", "logged", "...
+#> $ camera     (chr) "cam001", "cam001", "cam001", "cam001", "cam001", "...
+#> $ species    (chr) "muntjac", "muntjac", "muntjac", "squirrel", "squir...
+#> $ n          (int) 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 2, 2, NA,...
+#> $ datetime   (time) 2014-06-14 07:36:50, 2014-06-14 07:36:54, 2014-07-...
 ```
 
 Note that the column `datetime` is not a character string, but a POSIXct DateTime object. This will prove useful for later processing involving manipulation of the date and time.
@@ -228,9 +263,18 @@ In most cases, the default behaviour of `cam_process()` will produce the desired
 
 `cam_process()` will display a progress bar and informative messages as it process a set of camera trap photos. These messages will highlight potential issues with your photos and can be particularly useful if you haven't run `cam_check()` first. For example, processing the photos in the included `messy` photo set will produce a series of messages highlighting some of the same problems that were found by `cam_check()` above:
 
-```{r, message=T, results='hide'}
+
+```r
 messy_path <- system.file("extdata", "messy", package = "camtrapr")
 messy_data <- cam_process(messy_path)
+#> 1 images are in ignored directories.
+#> The following images are not correctly filed:
+#> primary/cam 004/wild_boar/IMG016.JPG
+#> primary/cam003/IMG001.JPG
+#> 
+#> The following directories do not have valid counts:
+#> logged/cam001/muntj@c/one
+#> primary/cam003/muntjc/one
 ```
 
 To turn these messages off use the argument `verbose = FALSE`.
@@ -249,40 +293,70 @@ Note that no files or folders will be renamed on your hard drive, only the assoc
 
 If you wish to turn on this functionality and preserve all variables as they are, use the `clean_names` argument to `cam_process()`.
 
-```{r}
+
+```r
 messy_data_asis <- cam_process(messy_path, clean_names = FALSE, verbose = FALSE)
 messy_data_asis[c(1,10,11),]
+#> Source: local data frame [3 x 7]
+#> 
+#>                  photo_path photo_file    site  camera species     n
+#>                       (chr)      (chr)   (chr)   (chr)   (chr) (int)
+#> 1 logged/cam001/muntj@c/one IMG020.JPG  logged  cam001 muntj@c    NA
+#> 2 primary/cam 004/muntjac/1 IMG010.JPG primary cam 004 muntjac     1
+#> 3 primary/cam 004/muntjac/1 IMG011.jpg primary cam 004 muntjac     1
+#> Variables not shown: datetime (time)
 messy_data[c(1,10,11),]
+#> Source: local data frame [3 x 7]
+#> 
+#>                  photo_path photo_file    site  camera species     n
+#>                       (chr)      (chr)   (chr)   (chr)   (chr) (int)
+#> 1 logged/cam001/muntj@c/one IMG020.JPG  logged  cam001 muntj_c    NA
+#> 2 primary/cam 004/muntjac/1 IMG010.JPG primary cam_004 muntjac     1
+#> 3 primary/cam 004/muntjac/1 IMG011.jpg primary cam_004 muntjac     1
+#> Variables not shown: datetime (time)
 ```
 
 ### Datetimes vs. Strings
 
 By default, `cam_process()` returns photo time stamps as `POSIXct` datetime objects. This is R's native format for storing dates and times. The benefit of using a variable of this type, as opposed to a character string, is that it can be easily manipulated with functions from base R or the [`lubridate`](https://github.com/hadley/lubridate) package. For example, the difference between datetimes can be calculated, or the week number in the current year be extracted:
 
-```{r}
+
+```r
 cam_data$datetime[1] - cam_data$datetime[nrow(cam_data)]
+#> Time difference of -440.5695 days
 lubridate::week(cam_data$datetime[1])
+#> [1] 24
 ```
 
 `POSIXct` variables always have a time zone associated with them. By default, `camtrapr` uses [Universal Coordinated Time](https://en.wikipedia.org/wiki/Coordinated_Universal_Time) (UTC), which is essentially Greenwich Mean Time (GMT). In most situations, although UTC is likely not technically correct for your photos, the time zone is not relevant provided it's consistent across all photos. So, unless you have a good reason, leave the defaults as it.
 
 If you do wish to change the time zone, pass the desired platform specific time zone string to the `tz` parameter of `cam_process()`. To read more about time zones in R, consult `help("timezones")`.
 
-```{r}
+
+```r
 (my_tz <- Sys.timezone())
+#> [1] "America/Vancouver"
 cam_data_tz <- cam_process(photo_path, tz = my_tz, verbose = FALSE)
 head(cam_data_tz$datetime, 3)
+#> [1] "2014-06-14 07:36:50 PDT" "2014-06-14 07:36:54 PDT"
+#> [3] "2014-07-06 21:07:23 PDT"
 head(cam_data$datetime, 3)
+#> [1] "2014-06-14 07:36:50 UTC" "2014-06-14 07:36:54 UTC"
+#> [3] "2014-07-06 21:07:23 UTC"
 ```
 
 If you prefer character strings instead of datetimes, the `datetime` column can easily be converted with `as.character()`
 
-```{r}
+
+```r
 head(as.character(cam_data$datetime))
+#> [1] "2014-06-14 07:36:50" "2014-06-14 07:36:54" "2014-07-06 21:07:23"
+#> [4] "2014-06-02 18:43:13" "2014-06-25 14:21:32" "2014-06-28 07:02:39"
 ```
 
 Or, use `as_datetime = FALSE` when calling `cam_process()`
 
-```{r, eval=F}
+
+```r
 cam_process(photo_path, as_datetime = FALSE)
 ```
