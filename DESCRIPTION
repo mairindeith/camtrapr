@@ -7,14 +7,18 @@ Description: This R package aids in the processing of camera trap photos in
     preparation for further statistical analysis in R. Species within each photo
     should be identified, and the photos should be organized into a specific
     directory structure, prior to using the functions within the package.
-Depends:
+Depends: 
     R (>= 3.2.0)
 License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/mstrimas/camtrapr
 BugReports: https://github.com/mstrimas/camtrapr/issues
-Imports:
+Imports: 
     assertthat,
     dplyr,
-    plyr
+    plyr,
+    lubridate
 RoxygenNote: 5.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr

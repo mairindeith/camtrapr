@@ -27,7 +27,7 @@ find_bad_counts <- function(x) {
 
 find_bad_names <- function(x) {
   assertthat::assert_that(is.character(x))
-  l <- vapply(x, function(x) any(grepl("[^_[:alnum:]]", split_path(x))), logical(1))
+  l <- vapply(x, function(x) any(grepl("[^[:alnum:]_-]", split_path(x))), logical(1))
 }
 
 # given a df with a path to photo variable, split and convert into variables
@@ -44,5 +44,5 @@ parse_path <- function(x) {
 clean_str <- function(x) {
   x <- tolower(x)
   # convert whitespace and non-alphanumeric characters to _
-  gsub("[^[:alnum:]]+", "_", trimws(x))
+  gsub("[^[:alnum:]_-]+", "_", trimws(x))
 }

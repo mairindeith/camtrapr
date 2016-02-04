@@ -14,23 +14,22 @@
 #' references listed below.
 #'
 #' @param img a character vector of paths to jpeg images
-#' @param as_datetime a logical value indicating whether the datetimes should
-#'        be returned as POSIXct datetime objects (default) or character strings.
-#' @param tz a character string that specifies which time zone to parse the
-#'        date with. The string must be a time zone that is recognized by the
-#'        user's OS. Ignored if \code{as_datetime = FALSE}.
+#' @param as_datetime a logical value indicating whether the datetimes should be
+#'   returned as POSIXct datetime objects (default) or character strings.
+#' @param tz a character string that specifies which time zone to parse the date
+#'   with. The string must be a time zone that is recognized by the user's OS.
+#'   Ignored if \code{as_datetime = FALSE}.
 #' @param error a logical value indicating whether errors should be raised by
-#'        \code{exif_date}. If \code{error = TRUE}, then an error will be
-#'        raised if the file cannot be found, it is not an image, there is a
-#'        problem with the EXIF data, or there is no date present. If
-#'        \code{error == FALSE}, then exectution should always proceed error
-#'        free, and \code{NA} will be returned in all these problem cases.
+#'   \code{exif_date}. If \code{error = TRUE}, then an error will be raised if
+#'   the file cannot be found, it is not an image, there is a problem with the
+#'   EXIF data, or there is no date present. If \code{error == FALSE}, then
+#'   exectution should always proceed error free, and \code{NA} will be returned
+#'   in all these problem cases.
 #'
 #' @return A vector of POSIXct datetime objects or character strings
-#'        representing the datetime as "Y:M:D H:M:S".
-#' @references
-#'    \url{http://code.flickr.net/2012/06/01/parsing-exif-client-side-using-javascript-2/}
-#'    \url{https://github.com/cmartin/EXIFr/}
+#'   representing the datetime as "Y:M:D H:M:S".
+#' @references \url{https://github.com/cmartin/EXIFr/}
+#'  \url{http://code.flickr.net/2012/06/01/parsing-exif-client-side-using-javascript-2/}
 #' @export
 #' @examples
 #' img <- system.file("extdata", "muntjac.jpg", package = "camtrapr")
@@ -40,7 +39,7 @@
 #' exif_date(c(img, img_nodate), error = FALSE)
 #' exif_date(c(img, img_nodate), as_datetime = FALSE, error = FALSE)
 exif_date <- function(img, as_datetime = TRUE, tz = "UTC", error = FALSE) {
-  if (length(img) > 50) {
+  if (length(img) > 25) {
     message("Reading EXIF Metadata:")
     pbar <- "text"
   } else {
@@ -65,8 +64,13 @@ exif_date <- function(img, as_datetime = TRUE, tz = "UTC", error = FALSE) {
 }
 
 .exif_date <- function(img) {
-  assertthat::assert_that(file.exists(img))
-
+  assertthat::assert_that(is.character(img),
+                          length(img) == 1,
+                          file.exists(img)
+                          )
+  if (!grepl("\\.(jpg|jpeg)$", "asdfds.jpg", ignore.case = TRUE)) {
+    stop(paste0("File is not a Jpeg:\n", img))
+  }
   # read the file header; exif data should be in first 128kb
   con <- file(img, "rb")
   b <- readBin(con, "raw", n = 128000)

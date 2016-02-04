@@ -10,24 +10,22 @@ cam_process(path, as_datetime = TRUE, tz = "UTC", clean_names = TRUE,
 \arguments{
 \item{path}{character; base path for all photos}
 
-\item{as_datetime}{a logical value indicating whether the datetimes should
-be returned as POSIXct datetime objects (default) or character strings.}
+\item{as_datetime}{a logical value indicating whether the datetimes should be
+returned as POSIXct datetime objects (default) or character strings.}
 
-\item{tz}{a character string that specifies which time zone to parse the
-date with. The string must be a time zone that is recognized by the
-user's OS. Ignored if \code{as_datetime = FALSE}.}
+\item{tz}{a character string that specifies which time zone to parse the date
+with. The string must be a time zone that is recognized by the user's OS.
+Ignored if \code{as_datetime = FALSE}.}
 
 \item{clean_names}{logical idicating whether to clean up site, camera, and
-species names. If \code{TRUE}, leading and trailing whitespace is
-trimmed, any non-alphanumeric character will be converted to an
-underscore, then groups of more than one underscore will be collapsed
-to one. WARNING: if names are cleaned it is possible that previously
+species names. If \code{TRUE}, leading and trailing whitespace is trimmed,
+any non-alphanumeric character (other than _ and -) will be converted to an
+underscore. WARNING: if names are cleaned it is possible that previously
 unique site, camera, or species names will no longer be unique.}
 
 \item{verbose}{logical indicating whether to print messages highlighting
 potential issues including directories than have been ignore, invalid
-directory structures, and count directories not corresponding to
-integers.}
+directory structures, and count directories not corresponding to integers.}
 }
 \value{
 Data frame (with class \code{tbl_df} from \code{dplyr}) of processed
@@ -52,22 +50,27 @@ directories such as \code{site/camera/species/number/photo.jpg} where:
  \item \code{photo.jpg}: photos are placed at the end of this chain of
      directories, the actual name of the photo is irrelevant, but it must
      have an EXIF datetime stamp
- }
+}
 
 All these directory are placed within a top-level directory containing no
- other files. It is this directory that is passed to \code{cam_process()}.
- The recommended best practice is to only use underscores and lowercase
- letters in all site, camera, and species directory names. Uppercase letters,
- special characters, and whitespace should be avoided.
+other files. It is this directory that is passed to \code{cam_process()}.
+The recommended best practice is to only use underscores and lowercase
+letters in all site, camera, and species directory names. Uppercase letters,
+special characters, and whitespace should be avoided.
 
 It is critical that the directory structure is correct because
- \code{cam_process()} will use this structure populate the resulting data
- frame. As a result, it is highly recommended that users run
- \code{\link{cam_check}} to find and correct any problems before
- \code{cam_process()} is run.
+\code{cam_process()} will use this structure populate the resulting data
+frame. As a result, it is highly recommended that users run
+\code{\link{cam_check}} to find and correct any problems before
+\code{cam_process()} is run.
+
+There are two special cases for directory names. Any directory named "ignore"
+will be completely ignored, and so will it's subdirectories. A count
+directory named "x" signals that the number of individuals in unknown and
+that field should be populated with \code{NA}.
 }
 \examples{
-photo_path <- system.file("extdata", "example_photos", package = "camtrapr")
+photo_path <- system.file("extdata", "example-photos", package = "camtrapr")
 cam_data <- cam_process(photo_path)
 dplyr::glimpse(cam_data)
 messy_path <- system.file("extdata", "messy", package = "camtrapr")

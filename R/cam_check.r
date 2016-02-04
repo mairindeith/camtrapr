@@ -1,11 +1,51 @@
 #' Check camera trap photos & directories
 #'
+#' Check to ensure that a directory of camera trap photos is correctly organized
+#' into subfolders.
+#'
+#' \code{\link{cam_process}} requires that camera trap photos are organized into
+#' a strict, hierarchical directory structure. \code{cam_check} ensure that this
+#' structure is adhered to and should always be run prior to
+#' \code{\link{cam_process}}.
+#'
+#' Every photo should be placed into a series of directories such as
+#' \code{site/camera/species/number/photo.jpg} where:
+#'
+#' \enumerate{
+#'  \item \code{site}: names of the location where cameras were placed
+#'  \item \code{camera}: unique identifiers for each camera
+#'  \item \code{species}: name of species identified in photo
+#'  \item \code{number}: number (e.g. 3) of individuals in photo. If the number
+#'      of individuals is unknown use "x" for the directory name.
+#'  \item \code{photo.jpg}: photos are placed at the end of this chain of
+#'      directories, the actual name of the photo is irrelevant, but it must
+#'      have an EXIF datetime stamp
+#' }
+#'
+#' \code{cam_check} returns a named list with eight elements (each a character
+#' vector) corresponding to the eight checks that it performs:
+#'
+#' \itemize{
+#'  \item \code{ignore}: photos ignored because they're it directories
+#'      named "ignore".
+#'  \item \code{directory_problem}: photos that are not correctly nested within
+#'      subdirectory structure.
+#'  \item \code{missing_date}: photos that have no associated EXIF date
+#'  \item \code{name_problem}: directories with spaces or special characters
+#'      in the name; only letters, numbers, and _ or - should occur.
+#'  \item \code{count_problem}: count directories that are not either integers
+#'      or "x".
+#'  \item \code{site}: alphabetic list of unique sites; check for typos.
+#'  \item \code{camera}: alphabetic list of unique cameras; check for typos.
+#'  \item \code{species}: alphabetic list of unique species; check for typos.
+#' }
+#'
 #' @param path character; base path for all photos
 #'
 #' @return \code{cam_check} returns an S3 object of class "cam_check", which is
-#'        a named list with each element corresponding to results of a different
-#'        check. Call \code{print} to see a summary of the number of errors, or
-#'        potential errors, found in each category.
+#'   a named list with each element corresponding to results of a different
+#'   check. Call \code{print} to see a summary of the number of errors, or
+#'   potential errors, found in each category.
 #' @export
 #' @examples
 #' messy_path <- system.file("extdata", "messy", package = "camtrapr")
@@ -22,7 +62,9 @@ cam_check <- function(path) {
   # list all jpegs in given folder
   photos <- list.files(path,pattern = "\\.(jpg|jpeg)$", ignore.case = TRUE,
                        recursive = TRUE)
-  assertthat::assert_that(length(photos) > 0)
+  if (length(photos) == 0) {
+    stop(paste0("No photos found in:\n", path))
+  }
 
   # ignore directories
   ignore <- find_ignore(photos)
@@ -30,8 +72,8 @@ cam_check <- function(path) {
   photos <- photos[!ignore]
 
   # missing dates
-  dt <- exif_date(photos, error = FALSE)
-  missing_dt_photos <- photos[!is.na(dt)]
+  dt <- exif_date(file.path(path, photos), error = FALSE)
+  missing_dt_photos <- photos[is.na(dt)]
 
   # bad subdirectory structure
   bad_sd <- find_bad_sd(photos)
@@ -57,7 +99,7 @@ cam_check <- function(path) {
     list(
       ignore = ignore_photos,
       directory_problem = bad_sd_photos,
-      missing_dates = missing_dt_photos,
+      missing_date = missing_dt_photos,
       name_problem = bad_name_dirs,
       count_problem = bad_count_dirs,
       site = site,
@@ -71,10 +113,10 @@ cam_check <- function(path) {
 #' @export
 print.cam_check <- function(x, ...) {
   cat("# photos in ignored directories (ignore): ", length(x$ignore), "\n")
-  cat("# photo in non-standard directories (directory_problem): ",
+  cat("# photos in non-standard directories (directory_problem): ",
       length(x$directory_problem), "\n")
-  cat("# photos with datetime or EXIF problems (missing_dates): ",
-                length(x$missing_dates), "\n")
+  cat("# photos with datetime or EXIF problems (missing_date): ",
+                length(x$missing_date), "\n")
   cat("# naming problems (name_problem): ", length(x$name_problem), "\n")
   cat("# count directory parse errors (count_problem): ",
       length(x$count_problem), "\n")

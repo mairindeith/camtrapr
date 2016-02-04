@@ -9,23 +9,23 @@ exif_date(img, as_datetime = TRUE, tz = "UTC", error = FALSE)
 \arguments{
 \item{img}{a character vector of paths to jpeg images}
 
-\item{as_datetime}{a logical value indicating whether the datetimes should
-be returned as POSIXct datetime objects (default) or character strings.}
+\item{as_datetime}{a logical value indicating whether the datetimes should be
+returned as POSIXct datetime objects (default) or character strings.}
 
-\item{tz}{a character string that specifies which time zone to parse the
-date with. The string must be a time zone that is recognized by the
-user's OS. Ignored if \code{as_datetime = FALSE}.}
+\item{tz}{a character string that specifies which time zone to parse the date
+with. The string must be a time zone that is recognized by the user's OS.
+Ignored if \code{as_datetime = FALSE}.}
 
 \item{error}{a logical value indicating whether errors should be raised by
-\code{exif_date}. If \code{error = TRUE}, then an error will be
-raised if the file cannot be found, it is not an image, there is a
-problem with the EXIF data, or there is no date present. If
-\code{error == FALSE}, then exectution should always proceed error
-free, and \code{NA} will be returned in all these problem cases.}
+\code{exif_date}. If \code{error = TRUE}, then an error will be raised if
+the file cannot be found, it is not an image, there is a problem with the
+EXIF data, or there is no date present. If \code{error == FALSE}, then
+exectution should always proceed error free, and \code{NA} will be returned
+in all these problem cases.}
 }
 \value{
 A vector of POSIXct datetime objects or character strings
-       representing the datetime as "Y:M:D H:M:S".
+  representing the datetime as "Y:M:D H:M:S".
 }
 \description{
 Extract the date and time a photo was taken from its EXIF data.
@@ -51,7 +51,7 @@ exif_date(c(img, img_nodate), error = FALSE)
 exif_date(c(img, img_nodate), as_datetime = FALSE, error = FALSE)
 }
 \references{
-\url{http://code.flickr.net/2012/06/01/parsing-exif-client-side-using-javascript-2/}
-   \url{https://github.com/cmartin/EXIFr/}
+\url{https://github.com/cmartin/EXIFr/}
+ \url{http://code.flickr.net/2012/06/01/parsing-exif-client-side-using-javascript-2/}
 }
 

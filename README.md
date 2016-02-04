@@ -1,4 +1,4 @@
-This R package aids in the processing of camera trap photos. The functions are inspired by the Windows programs developed for the same purpose by the [Small Wild Cat Conservation Foundation](http://www.smallcats.org/). The motivation behind creating this package was a desire to have a cross platform tool (i.e. not Windows only) that allows for a seamless R workflow; the assumption being that the data generated from the photos will eventually be analyzed in R.
+`camtrapr` is designed to process photos from camera trapping projects into a form useful for further analyis in R. The functions are inspired by the Windows programs developed for the same purpose by the [Small Wild Cat Conservation Foundation](http://www.smallcats.org/). The motivation behind creating this package was a desire to have a cross platform tool (i.e. not Windows only) that allows for a seamless R workflow; the assumption being that the data generated from the photos will eventually be analyzed in R.
 
 # Installation
 

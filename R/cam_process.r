@@ -16,31 +16,34 @@
 #'  \item \code{photo.jpg}: photos are placed at the end of this chain of
 #'      directories, the actual name of the photo is irrelevant, but it must
 #'      have an EXIF datetime stamp
-#'  }
+#' }
 #'
-#'  All these directory are placed within a top-level directory containing no
-#'  other files. It is this directory that is passed to \code{cam_process()}.
-#'  The recommended best practice is to only use underscores and lowercase
-#'  letters in all site, camera, and species directory names. Uppercase letters,
-#'  special characters, and whitespace should be avoided.
+#' All these directory are placed within a top-level directory containing no
+#' other files. It is this directory that is passed to \code{cam_process()}.
+#' The recommended best practice is to only use underscores and lowercase
+#' letters in all site, camera, and species directory names. Uppercase letters,
+#' special characters, and whitespace should be avoided.
 #'
-#'  It is critical that the directory structure is correct because
-#'  \code{cam_process()} will use this structure populate the resulting data
-#'  frame. As a result, it is highly recommended that users run
-#'  \code{\link{cam_check}} to find and correct any problems before
-#'  \code{cam_process()} is run.
+#' It is critical that the directory structure is correct because
+#' \code{cam_process()} will use this structure populate the resulting data
+#' frame. As a result, it is highly recommended that users run
+#' \code{\link{cam_check}} to find and correct any problems before
+#' \code{cam_process()} is run.
+#'
+#' There are two special cases for directory names. Any directory named "ignore"
+#' will be completely ignored, and so will it's subdirectories. A count
+#' directory named "x" signals that the number of individuals in unknown and
+#' that field should be populated with \code{NA}.
 #'
 #' @param path character; base path for all photos
 #' @param clean_names logical idicating whether to clean up site, camera, and
-#'        species names. If \code{TRUE}, leading and trailing whitespace is
-#'        trimmed, any non-alphanumeric character will be converted to an
-#'        underscore, then groups of more than one underscore will be collapsed
-#'        to one. WARNING: if names are cleaned it is possible that previously
-#'        unique site, camera, or species names will no longer be unique.
+#'   species names. If \code{TRUE}, leading and trailing whitespace is trimmed,
+#'   any non-alphanumeric character (other than _ and -) will be converted to an
+#'   underscore. WARNING: if names are cleaned it is possible that previously
+#'   unique site, camera, or species names will no longer be unique.
 #' @param verbose logical indicating whether to print messages highlighting
-#'        potential issues including directories than have been ignore, invalid
-#'        directory structures, and count directories not corresponding to
-#'        integers.
+#'   potential issues including directories than have been ignore, invalid
+#'   directory structures, and count directories not corresponding to integers.
 #' @inheritParams exif_date
 #'
 #' @return Data frame (with class \code{tbl_df} from \code{dplyr}) of processed
@@ -48,7 +51,7 @@
 #'   \code{cam_data} for use with other methods in the \code{camtrapr} package.
 #' @export
 #' @examples
-#' photo_path <- system.file("extdata", "example_photos", package = "camtrapr")
+#' photo_path <- system.file("extdata", "example-photos", package = "camtrapr")
 #' cam_data <- cam_process(photo_path)
 #' dplyr::glimpse(cam_data)
 #' messy_path <- system.file("extdata", "messy", package = "camtrapr")
@@ -64,14 +67,14 @@ cam_process <- function(path, as_datetime = TRUE, tz = "UTC",
   # list all jpegs in given folder
   photos <- list.files(path,pattern = "\\.(jpg|jpeg)$", ignore.case = TRUE,
                        recursive = TRUE)
-  assertthat::assert_that(length(photos) > 0)
+  if (length(photos) == 0) {
+    stop(paste0("No photos found in:\n", path))
+  }
 
   # drop any files in directories named "ignore"
   ignore <- find_ignore(photos)
   if (verbose && any(ignore)) {
-    message("The following images are in ignored directories:")
-    message(paste(photos[ignore], collapse = "\n"))
-    message()
+    message(paste0(sum(ignore), " images are in ignored directories.\n"))
   }
   photos <- photos[!ignore]
 
@@ -84,6 +87,10 @@ cam_process <- function(path, as_datetime = TRUE, tz = "UTC",
     message()
   }
   photos <- photos[!bad_sd]
+
+  if (length(photos) == 0) {
+    stop(paste0("No correctly filed photos found in:\n", path))
+  }
 
   # find exif dates for these photos
   dt <- exif_date(file.path(path, photos), as_datetime = as_datetime,

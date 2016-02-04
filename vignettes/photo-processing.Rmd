@@ -1,0 +1,214 @@
+---
+title: "Vignette Title"
+author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: html_document
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include=F}
+knitr::opts_chunk$set(collapse = TRUE, message = FALSE, comment = "#>", 
+                      warning = FALSE)
+```
+
+
+`camtrapr` is designed to process photos from camera trapping projects into a form useful for further analyis in R. The functions are inspired by the Windows programs developed for the same purpose by the [Small Wild Cat Conservation Foundation](http://www.smallcats.org/). So, users of these tools will easily be able to transition to `camtrapr`.
+
+The motivation behind creating this package was a desire to have an open source, cross platform tool (i.e. not Windows only) that allows for a seamless R camera trapping workflow.
+
+# Example Datasets
+
+This package comes with two sets of example photos to demonstrate the functionality of the package. They are from a hypothetical camera trapping project that sampled a logged forest and a primary forest to compare mammal diversity. At each site two camera trap stations were set up, and a variety of mammal species were caught on camera and identified.
+
+In the first set of photos, they have all been correctly identified and organized. In the second, a variety of errors have been intentially introduced. These paths to these photos on your local machine are given by:
+
+```{r, results='hide'}
+library(camtrapr)
+system.file("extdata", "example-photos", package = "camtrapr")
+system.file("extdata", "messy", package = "camtrapr")
+```
+
+# Photo Organization
+
+Prior to using this package, the animals in all photos need to be identified and the photos need to be put into a very particular, hierarchical directory structure. This directory structure conveys the metadata about each photo to the functions within this package. For those familiar with the tools from [smallcats.org](http://www.smallcats.org/), the photo organization is essentially identical.
+
+The assumption is that you have a project where you're trapping at multiple sites, at each site you have multiple cameras, and each camera records multiple species with varying numbers of individuals. Every photo should be placed in a series of directories:
+
+```
+project/site/camera/species/n/photo.jpg
+```
+
+Where each subdirectory conveys a distinct piece of metadata as follows:
+
+1.  `project`: a top level directory for a given project, which should contain
+    only organized camera trap photos and nothing else.
+2.  `site`: the unique name or ID of each site where the photos were taken, e.g.
+    `logged-forest`, `danum-valley` or `palm-plantation`. 
+3.  `camera`: the unique name or ID of each camera, e.g. `cam01` or `dvca101`.
+4.  `species`: the name of the species you recorded on the camera, e.g. `deer`,
+    `wild-boar`, or `elephas_maximus`.
+5.  `n`: the number of individuals of the given species seen in the photo. This 
+    must be an integer (e.g. `1` or `11`) or, if you don't know or don't care 
+    how many individuals were seen, use an `x`.
+6.  `photo.jpg`: the actual camera trap photo. The name of the photo is not
+    important; however, the photo should have an EXIF DateTime stamp.
+    
+There is one exception to this hierarchy: if any directory is named `ignore`, all its contents will be completely ignore. This is a good way to deal with photos that haven't been sorted yet or photos that have no animal in them.
+
+As an example, the example photos provided with this package are organized as follows:
+
+```
+example-photos/
+├── logged
+│   ├── cam001
+│   │   ├── muntjac
+│   │   │   └── 1
+│   │   │       ├── IMG020.JPG
+│   │   │       ├── IMG021.JPG
+│   │   │       └── IMG022.JPG
+│   │   ├── squirrel
+│   │   │   └── 1
+│   │   │       ├── IMG025.JPG
+│   │   └── wild-boar
+│   │       ├── 1
+│   │       │   ├── IMG032.JPG
+│   │       └── 2
+│   │           ├── IMG049.JPG
+│   └── cam002
+│       ├── squirrel
+│       │   └── 1
+│       │       ├── IMG034.JPG
+│       └── wild-boar
+│           ├── 2
+│           │   ├── IMG046.JPG
+│           └── x
+│               ├── IMG048.JPG
+└── primary
+    ├── cam003
+    │   ├── ignore
+    │   │   └── IMG001.JPG
+    │   ├── muntjac
+    │   │   └── 1
+    │   │       ├── IMG004.JPG
+    │   └── porcupine
+    │       └── 1
+    │           └── IMG008.JPG
+    └── cam004
+        ├── muntjac
+        │   └── 1
+        │       ├── IMG010.JPG
+        ├── squirrel
+        │   └── 2
+        │       ├── IMG012.JPG
+        └── wild-boar
+            └── 1
+                ├── IMG015.JPG
+```
+
+For brevity, only the first image is displayed within each directory. In this example project, the sites are `logged` and `primary`, the cameras are named `cam001`-`cam004`, and `example-photos` is the top level directory containing everything.
+
+## Naming Files
+
+Adhering to strict, well thought out file naming conventions is critical to reduces the number of errors introduced into your data. `camtrapr` will work on messy directory names, but I **strongly** recommend following these protocols when naming the directories in the above hierarchy:
+
+- Use only letters (a-z) and numbers (0-9) in directory names. No 
+  special characters, e.g. %, &, or #.
+- Avoid uppercase letters (A-Z). This will avoid giving multiple names to the 
+  species, e.g. "Deer" and "deer".
+- Avoid whitespace in names, instead use underscores (_) or dashes (-) as 
+  seperators
+- Be consistent! If you decide to use "_" as a seperator, stick with it and 
+  don't also use "-". Try not to mix common and scientific names. Again, this
+  will ensure you don't end up with multiple "species" that are actually the 
+  same, e.g. "elephant", "AsianElephant", "asian-elephant", and 
+  "Elephas_maximus".
+
+# Checking for Errors
+
+Prior to processing the camera trap photos, it's recommended that you run `cam_check()` to help find any errors that may have been introduced during the file organization and naming process.
+
+The `messy` directory, provided with this package, has a variety of intentially introduced errors. To run the checks, you just provide the path to this directory to the `cam_checks()` function.
+
+```{r}
+(messy_path <- system.file("extdata", "messy", package = "camtrapr"))
+checks <- cam_check(messy_path)
+```
+
+`checks` is a list with 8 named elements, each corresponding to a different check that is performed by `cam_checks`.
+
+The list elements, and corresponding names, are:
+
+- `ignore`: photos ignored because they're it directories named "ignore".
+- `directory_problem`: photos that are not correctly nested within subdirectory
+  structure.
+- `missing_date`: photos that have no associated EXIF date
+- `name_problem`: directories with spaces or special characters in the name; 
+  only letters, numbers, and "_" or "-"" should occur.
+- `count_problem`: count directories that are not either integers or "x".
+- `site`: alphabetic list of unique sites; check for typos.
+- `camera`: alphabetic list of unique cameras; check for typos.
+- `species`: alphabetic list of unique species; check for typos.
+
+The default print methods provides a concise summary:
+
+```{r}
+checks
+```
+
+Evidently there are a bunch of potential issues that need investigating. For further details on each check, access the corresponding element. For example, there appears to be two directory problems:
+
+```{r}
+checks$directory_problem
+```
+
+These photos are not in the correct hierarchy as describe above. In particular, the first is not within a directory for the count and the second is missing count and species directoryies. After fixing these images we can move on to another check.
+
+There is one photo that's missing an EXIF date.
+
+```{r}
+checks$missing_date
+```
+
+This image should be removed or, if the date and time can be found by some other method, the image can be included, but you'll have to manually enter the date after processing the photos.
+
+The next check looks at non-standard naming of files.
+
+```{r}
+checks$name_problem
+```
+
+In the first case there's a special character (`@`), and in the second the name contains a space. Photo processing will work despite these issues; however, best practices suggest fixing the names to be in the standard format.
+
+`count_problem` highlights a couple directories for which the count subdirectory has been named "one" rather than "1".
+
+```{r}
+checks$count_problem
+```
+
+Finally, `species` gives an alphabetical list of species in the dataset. Taking a quick look at this is a good way to check for potential typoes.
+
+```{r}
+checks$species
+```
+
+Sure enough Muntjac has been mispelled twice, and Wild Boar appears under two names: "wild-board" and "wildboar".
+
+The moral of the exercise is that quickly running through these checks before processing the data can save time and frustration further down the line.
+
+# Processing Camera Trap Photos
+
+Now that the hard work of identifying and organizing your photos is done, and you've used `cam_check()` to ensure no mistakes were made, it's time to process the photos into a nice data frame with `cam_process()`. In the simplest case, just provide the path to the top-level directory.
+
+```{r, results='hide'}
+photo_path <- system.file("extdata", "example-photos", package = "camtrapr")
+cam_data <- cam_process(photo_path)
+```
+
+The photos have now been processed into a data frame ready for analysis.
+
+```{r, echo=F}
+knitr::kable(head(cam_data, 10))
+```
