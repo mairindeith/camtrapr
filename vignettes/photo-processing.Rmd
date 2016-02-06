@@ -1,7 +1,7 @@
 ---
 title: "Camera Trap Photo Processing"
-author: "Matt Strimas-Mackey"
-date: "`r Sys.Date()`"
+# author: "Matt Strimas-Mackey"
+# date: "`r Sys.Date()`"
 output: html_document
 vignette: >
   %\VignetteIndexEntry{Camera Trap Photo Processing}
@@ -13,6 +13,8 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, message = FALSE, comment = "#>", 
                       warning = FALSE)
 ```
+
+<img src="img/pig-tailed_macaque.jpg" style="display: block; margin: auto;" />
 
 `camtrapr` is designed to process photos from camera trapping projects into a form useful for further analysis in R. The functions are inspired by the Windows programs developed for the same purpose by the [Small Wild Cat Conservation Foundation](http://www.smallcats.org/). So, users of these tools will easily be able to transition to `camtrapr`.
 

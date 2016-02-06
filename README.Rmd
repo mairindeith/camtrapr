@@ -15,6 +15,8 @@ knitr::opts_chunk$set(
 library(camtrapr)
 ```
 
+<img src="vignettes/img/pig-tailed_macaque.jpg" style="display: block; margin: auto;" />
+
 `camtrapr` is designed to process photos from camera trapping projects into a form useful for further analysis in R. The functions are inspired by the Windows programs developed for the same purpose by the [Small Wild Cat Conservation Foundation](http://www.smallcats.org/). So, users of these tools will easily be able to transition to `camtrapr`.
 
 The motivation behind creating this package was a desire to have an open source, user friendly, cross platform tool (i.e. not Windows only) that allows for a seamless R camera trapping workflow.
